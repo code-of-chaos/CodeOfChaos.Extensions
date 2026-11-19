@@ -3,21 +3,23 @@
     <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-  <!-- .NET 10 -->
+  <!-- .NET 10 (LTS) -->
+  <!-- Microsoft.AspNetCore.* / Microsoft.EntityFrameworkCore.* 11.0.0 packages are net11.0-only,
+       so the net10.0 build must stay on the 10.0.x line. -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.15" />
   </ItemGroup>
-  <!-- .NET 9 -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="9.0.18" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.18" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.18" />
+  <!-- .NET 11 (STS) -->
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
+    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="11.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="11.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="11.0.0" />
   </ItemGroup>
   <!-- Common packages for all frameworks -->
   <ItemGroup>
-    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.16.0-preview.2" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
     <PackageVersion Include="CodeOfChaos.Ansi" Version="1.2.4" />
     <PackageVersion Include="CodeOfChaos.GeneratorTools" Version="2.2.1" />
@@ -30,11 +32,11 @@
     <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="11.0.0" />
     <PackageVersion Include="Moq" Version="4.21.0" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
-    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="11.0.0" />
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageVersion Include="TUnit" Version="1.68.4" />
-    <PackageVersion Include="coverlet.collector" Version="10.1.0" />
+    <PackageVersion Include="TUnit" Version="1.87.0" />
+    <PackageVersion Include="coverlet.collector" Version="10.1.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" />

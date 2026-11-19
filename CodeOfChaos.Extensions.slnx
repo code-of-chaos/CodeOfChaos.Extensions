@@ -10,10 +10,6 @@
     <File Path=".github/dependabot.yml" />
     <File Path=".github/PULL_REQUEST_TEMPLATE.md" />
   </Folder>
-  <Folder Name="/.dev-tools/github/scripts/">
-    <File Path=".github/scripts/bump_version.py" />
-    <File Path=".github/scripts/test_bump_version.py" />
-  </Folder>
   <Folder Name="/.dev-tools/github/workflows/">
     <File Path=".github/workflows/ci-release.yml" />
     <File Path=".github/workflows/ci-testing.yml" />
