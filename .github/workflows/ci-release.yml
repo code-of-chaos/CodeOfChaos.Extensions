@@ -32,27 +32,6 @@ permissions:
     id-token: write
 
 jobs:
-    tests-python:
-        name: Python Testing
-        runs-on: ubuntu-latest
-        
-        steps:
-            -   name: Checkout
-                uses: actions/checkout@v7
-
-            -   name: Setup Python
-                uses: actions/setup-python@v7
-                with:
-                    python-version: '3.x'
-
-            -   name: Install Test Deps
-                run: |
-                    python -m pip install --upgrade pip
-                    python -m pip install pytest
-
-            -   name: Run Pytest
-                run: python -m pytest .github/scripts -q
-    
     test-dotnet:
         name: .NET Testing
         runs-on: ubuntu-latest
@@ -65,9 +44,8 @@ jobs:
                 uses: actions/setup-dotnet@v6
                 with:
                     dotnet-version: |
-                        8.x
-                        9.x
                         10.x
+                        11.x
 
             -   name: Restore dependencies
                 run: dotnet restore CodeOfChaos.Extensions.Testing.slnf
@@ -81,7 +59,7 @@ jobs:
     bump-version:
         name: Bump Version
         runs-on: ubuntu-latest
-        needs: [ tests-python, test-dotnet ]
+        needs: [ test-dotnet ]
         
         permissions:
             contents: write
@@ -97,63 +75,21 @@ jobs:
                     fetch-depth: 0
                     token: ${{ secrets.RELEASE_TOKEN }}
 
-            -   name: Setup Python
-                uses: actions/setup-python@v7
-                with:
-                    python-version: '3.x'
-
-            -   name: Configure Git
-                run: |
-                    git config user.name "github-actions[bot]"
-                    git config user.email "github-actions[bot]@users.noreply.github.com"
-
             -   name: Bump Version
                 id: bump
-                run: |
-                    set -euo pipefail
-                    
-                    if [ "${{ inputs.version_bump }}" == "custom" ]; then
-                      if [ -z "${{ inputs.custom_version }}" ]; then
-                        echo "Error: custom_version is required when version_bump is 'custom'"
-                        exit 1
-                      fi
-                      VERSION=$(python .github/scripts/bump_version.py custom "${{ inputs.custom_version }}" | tail -n 1)
-                    else
-                      VERSION=$(python .github/scripts/bump_version.py ${{ inputs.version_bump }} | tail -n 1)
-                    fi
-                    
-                    TAG="v${VERSION}"
-                    
-                    echo "version=$VERSION" >> $GITHUB_OUTPUT
-                    echo "tag=$TAG" >> $GITHUB_OUTPUT
-                    
-                    echo "Bumped to version: $VERSION (tag: $TAG)"
-
-            -   name: Commit and Push
-                run: |
-                    set -euo pipefail
-                    TAG="${{ steps.bump.outputs.tag }}"
-                    
-                    git add src/Directory.Build.props
-                    
-                    if ! git diff --cached --quiet; then
-                      git commit -m "VersionBump : $TAG"
-                      git push origin HEAD:${{ github.ref_name }}
-                    else
-                      echo "No version file changes detected; skipping commit push."
-                    fi
-                    
-                    if git ls-remote --tags origin "$TAG" | grep -q "refs/tags/$TAG$"; then
-                      echo "Tag $TAG already exists on origin; skipping tag push."
-                    else
-                      git tag "$TAG" HEAD
-                      git push origin "$TAG"
-                    fi
+                uses: Code-Of-Chaos/action-version-bumper@v2
+                with:
+                    version_file: src/Directory.Build.props
+                    bump: ${{ inputs.version_bump }}
+                    custom_version: ${{ inputs.custom_version }}
+                    commit: 'true'
+                    tag: 'true'
+                    push: 'true'
     
     release:
         name: Release
         runs-on: ubuntu-latest
-        needs: [ tests-python, test-dotnet, bump-version ]
+        needs: [ test-dotnet, bump-version ]
         
         env:
             TAG: ${{ needs.bump-version.outputs.tag_name }}
@@ -169,7 +105,7 @@ jobs:
             -   name: Setup .NET
                 uses: actions/setup-dotnet@v6
                 with:
-                    dotnet-version: 10.x
+                    dotnet-version: 11.x
 
             -   name: Restore dependencies
                 run: dotnet restore CodeOfChaos.Extensions.Release.slnf
